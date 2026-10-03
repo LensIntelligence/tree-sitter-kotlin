@@ -670,7 +670,11 @@ module.exports = grammar({
       ),
     )),
 
-    annotated_expression: $ => seq($.annotation, $.expression),
+    // A declaration under annotations and an annotated expression are both valid readings of
+    // `@A @B class X { ... }` and `@A annotation class X`; without a preference the parser picked
+    // by node count, so the result depended on what followed. Declarations win: -2 outweighs the
+    // +1 a soft keyword such as `annotation` earns when read as an identifier (_reserved_identifier).
+    annotated_expression: $ => prec.dynamic(-2, seq($.annotation, $.expression)),
 
     labeled_expression: $ => seq($.label, $.expression),
 
