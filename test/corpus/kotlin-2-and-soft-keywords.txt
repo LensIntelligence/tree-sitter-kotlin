@@ -1,0 +1,347 @@
+================================================================================
+Annotation class after an annotation on the line above
+================================================================================
+
+@Target(AnnotationTarget.CLASS)
+annotation class Internal
+
+@Deprecated("old")
+class Legacy { fun go() = 1 }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (class_declaration
+    (modifiers
+      (annotation
+        (constructor_invocation
+          (user_type
+            (identifier))
+          (value_arguments
+            (value_argument
+              (navigation_expression
+                (identifier)
+                (identifier))))))
+      (class_modifier))
+    (identifier)))
+
+================================================================================
+Stacked annotations before a class with a body
+================================================================================
+
+@Component
+@Transactional
+class UserService {
+    // read user by primary key
+    fun find(id: Int) = repo.find(id)
+}
+
+@ImportRuntimeHints(value = [ResourceHints::class])
+@SpringBootApplication
+private class Application
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (class_declaration
+    (modifiers
+      (annotation
+        (user_type
+          (identifier)))
+      (annotation
+        (user_type
+          (identifier))))
+    (identifier)
+    (class_body
+      (line_comment)
+      (function_declaration
+        (identifier)
+        (function_value_parameters
+          (parameter
+            (identifier)
+            (user_type
+              (identifier))))
+        (function_body
+          (call_expression
+            (navigation_expression
+              (identifier)
+              (identifier))
+            (value_arguments
+              (value_argument
+                (identifier))))))))
+  (class_declaration
+    (modifiers
+      (annotation
+        (constructor_invocation
+          (user_type
+            (identifier))
+          (value_arguments
+            (value_argument
+              (identifier)
+              (collection_literal
+                (navigation_expression
+                  (identifier)
+                  (identifier)))))))
+      (annotation
+        (user_type
+          (identifier)))
+      (visibility_modifier))
+    (identifier)))
+
+================================================================================
+When entry with a guard condition
+================================================================================
+
+fun f(x: Any) = when (x) {
+    is String if x.isEmpty() -> 1
+    is Int, is Long -> 2
+    else -> 3
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (function_value_parameters
+      (parameter
+        (identifier)
+        (user_type
+          (identifier))))
+    (function_body
+      (when_expression
+        (when_subject
+          (identifier))
+        (when_entry
+          (type_test
+            (user_type
+              (identifier)))
+          (when_guard
+            (call_expression
+              (navigation_expression
+                (identifier)
+                (identifier))
+              (value_arguments)))
+          (number_literal))
+        (when_entry
+          (type_test
+            (user_type
+              (identifier)))
+          (type_test
+            (user_type
+              (identifier)))
+          (number_literal))
+        (when_entry
+          (number_literal))))))
+
+================================================================================
+Soft keyword where as an identifier at the start of a statement
+================================================================================
+
+fun f(where: Op?) {
+    where?.let { println(it) }
+    where = null
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (function_value_parameters
+      (parameter
+        (identifier)
+        (nullable_type
+          (user_type
+            (identifier)))))
+    (function_body
+      (block
+        (call_expression
+          (navigation_expression
+            (identifier)
+            (identifier))
+          (annotated_lambda
+            (lambda_literal
+              (call_expression
+                (identifier)
+                (value_arguments
+                  (value_argument
+                    (identifier)))))))
+        (assignment
+          (identifier)
+          (identifier))))))
+
+================================================================================
+Suspend lambda
+================================================================================
+
+fun f() {
+    suspend {
+        g()
+    }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (function_value_parameters)
+    (function_body
+      (block
+        (suspend_lambda
+          (lambda_literal
+            (call_expression
+              (identifier)
+              (value_arguments))))))))
+
+================================================================================
+Infix get after a trailing lambda
+================================================================================
+
+fun f() {
+    val id = t.insert {
+        it[code] = 2
+    } get t.id
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (function_value_parameters)
+    (function_body
+      (block
+        (property_declaration
+          (variable_declaration
+            (identifier))
+          (infix_expression
+            (call_expression
+              (navigation_expression
+                (identifier)
+                (identifier))
+              (annotated_lambda
+                (lambda_literal
+                  (assignment
+                    (index_expression
+                      (identifier)
+                      (identifier))
+                    (number_literal)))))
+            (identifier)
+            (navigation_expression
+              (identifier)
+              (identifier))))))))
+
+================================================================================
+Multi-dollar string literals
+================================================================================
+
+val a = $$"?(@.team == $team)"
+val b = $$"""{"team": "$name"}"""
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (property_declaration
+    (variable_declaration
+      (identifier))
+    (multi_dollar_string_literal))
+  (property_declaration
+    (variable_declaration
+      (identifier))
+    (multi_dollar_string_literal)))
+
+================================================================================
+Use-site target names as identifiers
+================================================================================
+
+fun f(delegate: D, field: F) {
+    val c = if (delegate is X) delegate.y else delegate
+    return field
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (function_value_parameters
+      (parameter
+        (identifier)
+        (user_type
+          (identifier)))
+      (parameter
+        (identifier)
+        (user_type
+          (identifier))))
+    (function_body
+      (block
+        (property_declaration
+          (variable_declaration
+            (identifier))
+          (if_expression
+            (is_expression
+              (identifier)
+              (user_type
+                (identifier)))
+            (navigation_expression
+              (identifier)
+              (identifier))
+            (identifier)))
+        (return_expression
+          (identifier))))))
+
+================================================================================
+Annotated accessor on the line after a bare property
+================================================================================
+
+class C {
+    val x
+        @OptIn(InternalApi::class)
+        get() = compute()
+    var z: List<R>? = null
+        @InternalApi
+        set
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (class_declaration
+    (identifier)
+    (class_body
+      (property_declaration
+        (variable_declaration
+          (identifier))
+        (getter
+          (modifiers
+            (annotation
+              (constructor_invocation
+                (user_type
+                  (identifier))
+                (value_arguments
+                  (value_argument
+                    (navigation_expression
+                      (identifier)
+                      (identifier)))))))
+          (function_body
+            (call_expression
+              (identifier)
+              (value_arguments)))))
+      (property_declaration
+        (variable_declaration
+          (identifier)
+          (nullable_type
+            (user_type
+              (identifier)
+              (type_arguments
+                (type_projection
+                  (user_type
+                    (identifier)))))))
+        (identifier)
+        (setter
+          (modifiers
+            (annotation
+              (user_type
+                (identifier)))))))))
