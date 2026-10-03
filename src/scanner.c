@@ -325,7 +325,7 @@ bool tree_sitter_kotlin_external_scanner_scan(void *payload, TSLexer *lexer, con
                 lexer->mark_end(lexer);
                 return true;
             case '@':
-                if (valid_symbols[CONSTRUCTOR]) {
+                if (valid_symbols[CONSTRUCTOR] && !(valid_symbols[GET] || valid_symbols[SET])) {
                     while (!iswspace(lexer->lookahead)) {
                         skip(lexer);
                     }
@@ -341,6 +341,10 @@ bool tree_sitter_kotlin_external_scanner_scan(void *payload, TSLexer *lexer, con
                     }
                     return false;
                 }
+                // An annotation on the line after a property may belong to its getter or setter
+                // (`val x` / `@OptIn(...)` / `get() = ...`); when an accessor is possible, look past the
+                // annotation for `get` / `set` before deciding on the semi (the branch below). A secondary
+                // constructor is not possible in that position, so the constructor check above is skipped.
                 if (valid_symbols[GET] || valid_symbols[SET]) {
                     bool saw_paren = false;
                     while ((saw_paren ? lexer->lookahead != '\n' : !iswspace(lexer->lookahead))) {
