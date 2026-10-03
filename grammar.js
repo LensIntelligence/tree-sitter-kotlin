@@ -631,6 +631,7 @@ module.exports = grammar({
       $._identifier,
       $.string_literal,
       $.multiline_string_literal,
+      $.multi_dollar_string_literal,
       $.character_literal,
       $.number_literal,
       $.float_literal,
@@ -679,6 +680,13 @@ module.exports = grammar({
 
     // `suspend { ... }`: the standard library's suspend builder called with a trailing lambda.
     suspend_lambda: $ => seq('suspend', $.lambda_literal),
+
+    // `$$"..."` and `$$"""..."""` (Kotlin 2.2 multi-dollar interpolation). Read as one opaque token:
+    // the interpolation prefix is `$$` so a lone `$` is literal text; templates inside are not separated.
+    multi_dollar_string_literal: _ => token(choice(
+      seq(/\$\$+/, '"""', /([^"]|"[^"]|""[^"])*/, '"""'),
+      seq(/\$\$+/, '"', repeat(choice(/[^"\\\n]/, /\\./)), '"'),
+    )),
 
     labeled_expression: $ => seq($.label, $.expression),
 
