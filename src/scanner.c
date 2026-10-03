@@ -156,6 +156,11 @@ bool tree_sitter_kotlin_external_scanner_scan(void *payload, TSLexer *lexer, con
 
         if (!saw_newline) {
             switch (lexer->lookahead) {
+                // A closing brace on the same line ends the member or statement before it:
+                // `class C { fun f() }`, `object O { val x = f<T>() }`. Without this the body
+                // needed a newline before `}` and a one-line body was an error region.
+                case '}':
+                    return true;
                 case '!':
                     skip(lexer);
                     goto continue_not_is_from_semi;
