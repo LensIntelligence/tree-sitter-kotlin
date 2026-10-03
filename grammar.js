@@ -657,6 +657,7 @@ module.exports = grammar({
       $.callable_reference,
       $.lambda_literal,
       $.anonymous_function,
+      $.suspend_lambda,
     ),
 
     unary_expression: $ => prec.left(PREC.UNARY, choice(
@@ -675,6 +676,9 @@ module.exports = grammar({
     // by node count, so the result depended on what followed. Declarations win: -2 outweighs the
     // +1 a soft keyword such as `annotation` earns when read as an identifier (_reserved_identifier).
     annotated_expression: $ => prec.dynamic(-2, seq($.annotation, $.expression)),
+
+    // `suspend { ... }`: the standard library's suspend builder called with a trailing lambda.
+    suspend_lambda: $ => seq('suspend', $.lambda_literal),
 
     labeled_expression: $ => seq($.label, $.expression),
 
