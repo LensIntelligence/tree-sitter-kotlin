@@ -23,7 +23,24 @@ class Legacy { fun go() = 1 }
                 (identifier)
                 (identifier))))))
       (class_modifier))
-    (identifier)))
+    (identifier))
+  (class_declaration
+    (modifiers
+      (annotation
+        (constructor_invocation
+          (user_type
+            (identifier))
+          (value_arguments
+            (value_argument
+              (string_literal
+                (string_content)))))))
+    (identifier)
+    (class_body
+      (function_declaration
+        (identifier)
+        (function_value_parameters)
+        (function_body
+          (number_literal))))))
 
 ================================================================================
 Stacked annotations before a class with a body
@@ -345,3 +362,42 @@ class C {
             (annotation
               (user_type
                 (identifier)))))))))
+
+================================================================================
+One-line class bodies
+================================================================================
+
+interface Drawable { fun draw() }
+object Registry { val items = mutableListOf<Shape>() }
+class C { fun f() = 1 }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (class_declaration
+    (identifier)
+    (class_body
+      (function_declaration
+        (identifier)
+        (function_value_parameters))))
+  (object_declaration
+    (identifier)
+    (class_body
+      (property_declaration
+        (variable_declaration
+          (identifier))
+        (call_expression
+          (identifier)
+          (type_arguments
+            (type_projection
+              (user_type
+                (identifier))))
+          (value_arguments)))))
+  (class_declaration
+    (identifier)
+    (class_body
+      (function_declaration
+        (identifier)
+        (function_value_parameters)
+        (function_body
+          (number_literal))))))
