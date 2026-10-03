@@ -307,6 +307,18 @@ bool tree_sitter_kotlin_external_scanner_scan(void *payload, TSLexer *lexer, con
                 else if (index == 1 && valid_symbols[IN]) {
                     return true;
                 }
+                // `where` continues a type-constraint clause (`where T : Foo`) and so suppresses the semi;
+                // but a line starting `where?.`, `where.`, `where =` or `where(` is an identifier named `where`
+                // (a statement), so the semi is inserted.
+                else if (index == 8) {
+                    while (iswspace(lexer->lookahead)) {
+                        skip(lexer);
+                    }
+                    if (lexer->lookahead == '?' || lexer->lookahead == '.' || lexer->lookahead == '=' ||
+                        lexer->lookahead == '(' || lexer->lookahead == '[') {
+                        return true;
+                    }
+                }
                 return !res;
             case ';':
                 advance(lexer);
