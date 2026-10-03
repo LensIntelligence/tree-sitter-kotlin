@@ -854,8 +854,13 @@ module.exports = grammar({
     when_entry: $ => seq(
       choice(
         seq(
-          commaSep1(field('condition', $._when_condition)),
-          optional(','),
+          field('condition', $._when_condition),
+          optional(choice(
+            // several conditions, optional trailing comma (no guard: Kotlin allows a guard only on a single condition)
+            seq(repeat1(seq(',', field('condition', $._when_condition))), optional(',')),
+            ',',
+            field('guard', $.when_guard),
+          )),
         ),
         'else',
       ),
@@ -863,6 +868,9 @@ module.exports = grammar({
       choice($.block, $.statement),
       optional($._semi),
     ),
+
+    // Kotlin 2.1 guard condition: `is Foo if foo.isValid() -> ...`
+    when_guard: $ => seq('if', $.expression),
 
     _when_condition: $ => choice(
       $.expression,
